@@ -29,20 +29,32 @@ class _DatePickerDemoState extends State<DatePickerDemo> {
   String formattedDate = dateFormat.format(selectedDate);
   // static DateFormat dateFormat = new DateFormat("yyyy-MM-dd");
 // String formattedDate = dateFormat.format(selectedDate);
-  var unavailableDates = ["2021-02-19", "2021-02-22", "2021-02-20"];
+  var unavailableDates = [
+    "2021-02-18",
+    "2021-02-19",
+    "2021-02-22",
+    "2021-02-20"
+  ];
   List<DateTime> availbleDates = [];
 
   List<DateTime> getDaysInBeteween(DateTime startDate, DateTime endDate) {
     List<DateTime> days = [];
+
     for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
-      String partialDate = "" +
+      String partialDate = "";
+      partialDate = "" +
           startDate.year.toString() +
           "-" +
           startDate.month.toString() +
           "-" +
-          startDate.day.toString();
+          (startDate.day + i).toString();
+      var parsedDate = DateFormat("yyyy-MM-dd").parse(partialDate);
+      String formattedDate = dateFormat.format(parsedDate);
 
-      if (!unavailableDates.contains(partialDate)) {
+      if (!unavailableDates.contains(formattedDate)) {
+        //print(dateFormat.format(parsedDate));
+        // days.add(parsedDate);
+        // print(dateFormat.format(parsedDate));
         days.add(DateTime(
             startDate.year,
             startDate.month,
@@ -53,14 +65,15 @@ class _DatePickerDemoState extends State<DatePickerDemo> {
     return days;
   }
 
-//   _selectedDate(){
-//    for (var i = 0; i < unavailableDates.length; i++) {
-//   print(DateFormat.yMMMd().format(int.parse(unavailableDates[i])));
-// }
+  _selectedDate() {
+    List<DateTime> days = getDaysInBeteween(
+        new DateTime.now(), new DateTime.now().add(new Duration(days: 30)));
+    return days.first;
+  }
 
   bool _decideWhichDayToEnable(DateTime val) {
     print(getDaysInBeteween(
-        new DateTime.now(), new DateTime.now().add(new Duration(days: 3))));
+        new DateTime.now(), new DateTime.now().add(new Duration(days: 30))));
 
     String _dates = dateFormat.format(val); //formatting passed in value
     //print((_dates));
@@ -94,8 +107,8 @@ class _DatePickerDemoState extends State<DatePickerDemo> {
   _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate,
-      firstDate: selectedDate,
+      initialDate: _selectedDate(),
+      firstDate: _selectedDate(),
       fieldLabelText: 'Booking date',
       fieldHintText: 'Month/Date/Year',
       helpText: 'Select Booking Date',
