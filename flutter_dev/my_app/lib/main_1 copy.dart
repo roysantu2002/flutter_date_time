@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 void main() {
@@ -24,19 +25,21 @@ class DatePickerDemo extends StatefulWidget {
 class _DatePickerDemoState extends State<DatePickerDemo> {
   /// Which holds the selected date
   /// Defaults to today's date.
-  static DateTime selectedDate = DateTime.now().add(new Duration(days: 3));
-  static DateFormat dateFormat = new DateFormat("yyyy-MM-dd");
-  String formattedDate = dateFormat.format(selectedDate);
+  static DateTime selectedDate = DateTime.now();
+
   // static DateFormat dateFormat = new DateFormat("yyyy-MM-dd");
 // String formattedDate = dateFormat.format(selectedDate);
+  static DateFormat dateFormat = new DateFormat("yyyy-MM-dd");
+  String formattedDate = dateFormat.format(selectedDate);
   var unavailableDates = [
-    "2021-02-18",
-    "2021-02-19",
-    "2021-02-22",
-    "2021-02-20"
+    "2021-02-28",
+    "2021-02-26",
+    "2021-03-01",
+    "2021-02-25"
   ];
+
   List<DateTime> availbleDates = [];
-  TimeOfDay time = TimeOfDay.now();
+
   List<DateTime> getDaysInBeteween(DateTime startDate, DateTime endDate) {
     List<DateTime> days = [];
 
@@ -72,51 +75,48 @@ class _DatePickerDemoState extends State<DatePickerDemo> {
     return days.first;
   }
 
-  bool _decideWhichDayToEnable(DateTime val) {
-    print(getDaysInBeteween(
-        new DateTime.now(), new DateTime.now().add(new Duration(days: 30))));
-
-    String _dates = dateFormat.format(val); //formatting passed in value
-    //print((_dates));
-    if (!unavailableDates.contains(_dates)) {
-      // selectedDate = val;
-      if (!availbleDates.contains(val)) {
-        //print(val);
-        availbleDates.add(val);
-      }
+  bool _decideWhichDayToEnable(DateTime day) {
+    if ((day.isAfter(DateTime.now().subtract(Duration(days: 1))) &&
+        day.isBefore(DateTime.now().add(Duration(days: 5))))) {
       return true;
-    } else {
-      return false;
     }
-    // return !unavailableDates.contains(_dates);
+    return false;
   }
 
-  // _nearestDate() {
-  //   // availbleDates.sort((a, b) => a.length.compareTo(b.length));
-  //   return availbleDates[0];
-  // }
-
-  //   final DateFormat formatter = DateFormat(dateTime);
-  // final String formatted = formatter.format(now);
-  //   if (dateTime.day == 10 || dateTime.day == 20 || dateTime.day == 30) {
-  //     //This means that No. 10, No. 20, No. 30 are not optional.
-  //     return false;
-  //   }
-  //   return true;
-  // }
-
   _selectDate(BuildContext context) async {
+    final ThemeData theme = Theme.of(context);
+    assert(theme.platform != null);
+    switch (theme.platform) {
+      case TargetPlatform.android:
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+        return buildMaterialDatePicker(context);
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        return buildCupertinoDatePicker(context);
+    }
+  }
+
+  /// This builds material date picker in Android
+
+  buildMaterialDatePicker(BuildContext context) async {
     final DateTime picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate(),
-      firstDate: _selectedDate(),
+      initialDate: selectedDate,
+      firstDate: new DateTime.now(),
       fieldLabelText: 'Booking date',
       fieldHintText: 'Month/Date/Year',
       helpText: 'Select Booking Date',
       cancelText: 'Not Now',
       confirmText: 'Book',
       lastDate: new DateTime.now().add(new Duration(days: 30)),
-      selectableDayPredicate: _decideWhichDayToEnable,
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light(),
+          child: child,
+        );
+      },
     );
     if (picked != null && picked != selectedDate)
       setState(() {
@@ -124,14 +124,30 @@ class _DatePickerDemoState extends State<DatePickerDemo> {
       });
   }
 
-  _pickTime(BuildContext context) async {
-    TimeOfDay timeDay =
-        await showTimePicker(context: context, initialTime: time);
-    if (timeDay != null) {
-      setState(() {
-        time = timeDay;
-      });
-    }
+  /// This builds cupertion date picker in iOS
+  buildCupertinoDatePicker(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext builder) {
+          return Container(
+            height: MediaQuery.of(context).copyWith().size.height / 3,
+            color: Colors.white,
+            child: CupertinoDatePicker(
+              mode: CupertinoDatePickerMode.date,
+              onDateTimeChanged: (picked) {
+                if (picked != null && picked != selectedDate)
+                  setState(() {
+                    selectedDate = picked;
+                  });
+              },
+              initialDateTime: selectedDate,
+              minimumDate: DateTime.now().add(Duration(days: -1)),
+              maximumDate: DateTime.now().add(Duration(days: 10)),
+              minimumYear: 2021,
+              maximumYear: 2021,
+            ),
+          );
+        });
   }
 
   @override
@@ -151,23 +167,7 @@ class _DatePickerDemoState extends State<DatePickerDemo> {
             RaisedButton(
               onPressed: () => _selectDate(context),
               child: Text(
-                'Select Date',
-                style:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              ),
-              color: Colors.greenAccent,
-            ),
-            Text(
-              "${time.hour}:" "${time.minute}",
-              style: TextStyle(fontSize: 55, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(
-              height: 20.0,
-            ),
-            RaisedButton(
-              onPressed: () => _pickTime(context),
-              child: Text(
-                'Select Time',
+                'Select date',
                 style:
                     TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
               ),
