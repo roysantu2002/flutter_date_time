@@ -1,0 +1,27 @@
+/* this is an abbreviated version of @font-face, meant to show how to reference the font in the relative url attribute.
+/* assuming the fonts were stored in public/fonts */
+
+/* body, #root {
+  background-color: #f6f7ef;
+  height: 100vh;
+  margin: 1
+}
+Main{
+  background-color: #f6f7ef;
+  height: 100vh;
+  margin: 1
+} */
+@font-face {
+  font-family: "Branch";
+  src: local("Branch"), url(/fonts/Branch.ttf) format("ttf");
+  font-display: swap;
+}
+@font-face {
+  font-family: "GothamBook";
+  src: local("GothamBook"), url(/fonts/GothamBook.ttf) format("ttf");
+  font-display: swap;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;1,300&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
