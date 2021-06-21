@@ -33,8 +33,9 @@ import {
 import PhoneIcon from "@material-ui/icons/Phone";
 import EmailIcon from "@material-ui/icons/Email";
 import FacebookIcon from "@material-ui/icons/Facebook";
-import PermIdentityIcon from "@material-ui/icons/PermIdentity";
 import PhoneRegistration from "../components/register/phoneregistration";
+import PermIdentityIcon from "@material-ui/icons/PermIdentity";
+
 import { IconButton } from "../components/controls";
 import { useRouter } from "next/router";
 import { addUser } from "../store/actions/userActions";
